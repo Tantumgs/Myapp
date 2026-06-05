@@ -1,0 +1,28 @@
+name: Build iOS
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: subosito/flutter@v3
+        with:
+          channel: stable
+          
+      - run: flutter pub get
+      
+      - run: flutter build ipa --release --export-options-plist=ios/ExportOptions.plist || flutter build ipa --release --export-method=ad-hoc
+      
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: ipa
+          path: build/ios/ipa/*.ipa
